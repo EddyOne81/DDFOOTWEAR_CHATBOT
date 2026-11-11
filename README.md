@@ -1,24 +1,78 @@
 # DDFOOTWEAR_CHATBOT
-**Overview**:
-- Production-ready e-commerce chatbot with automated order processing and 24/7 customer support, handling end-to-end purchase flow on Telegram platform.
 
-**Backend Development**:
-- Built Node.js webhook server handling real-time message processing from Telegram Bot API. 
-- Designed RESTful API architecture connecting Telegram Bot API with Dialogflow for intent recognition. 
-- Implemented MongoDB database schema for structured order data storage with state tracking and validation. 
-- Created automated order processing pipeline managing product selection, inventory, customer info, and delivery preferences. 
-- Developed FAQ module covering product details, shipping, returns, and refunds with fallback handling.
+E-commerce chatbot backend for processing shoe orders through a webhook and storing the order details in MongoDB.
 
-**Technical Skills Applied**:
-- RESTful API design and webhook architecture. 
-- Database schema design and NoSQL data modeling. 
-- Third-party API integration (Telegram, Dialogflow). 
-- Error handling, logging, and environment configuration management. 
-- Webhook security validation and development tunneling (Ngrok).
+## Project structure
 
-**Tech Stack**:
-- Node.js, Express.js, MongoDB, Dialogflow, Telegram Bot API, Ngrok
+```text
+src/
+  app.js              # Express app setup and route registration
+  server.js           # Database bootstrap and server startup
+  config/
+    database.js       # MongoDB connection configuration
+  controllers/
+    webhookController.js
+  models/
+    Order.js           # Order Mongoose schema
+  routes/
+    webhook.js         # Webhook route
 
-**Results**:
-- Processed 100+ test orders successfully
-- Achieved 95% intent recognition accuracy
+.env.example          # Example environment variables
+.gitignore            # Ignore environment and dependency files
+README.md             # Project documentation
+package.json          # Scripts and dependencies
+server.js             # Backward-compatible bootstrap entry point
+```
+
+## Features
+
+- Telegram / Dialogflow webhook handling
+- Order validation for required customer and product fields
+- MongoDB persistence for order records
+- Health check endpoint for monitoring
+
+## Tech stack
+
+- Node.js
+- Express.js
+- MongoDB + Mongoose
+- JavaScript
+
+## Run locally
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy environment variables:
+
+```bash
+cp .env.example .env
+```
+
+3. Start the server:
+
+```bash
+npm start
+```
+
+4. Or run in dev mode:
+
+```bash
+npm run dev
+```
+
+## Environment variables
+
+Create a `.env` file with values like:
+
+```env
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/shoe_store
+```
+
+## Notes
+
+This repository was reorganized to make the codebase easier to read and maintain. The app logic has been split into small modules so it is easier for other developers to understand and extend.
