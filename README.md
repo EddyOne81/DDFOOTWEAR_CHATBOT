@@ -1,78 +1,72 @@
 # DDFOOTWEAR_CHATBOT
 
-E-commerce chatbot backend for processing shoe orders through a webhook and storing the order details in MongoDB.
+A small Node.js and Express webhook service for receiving Dialogflow order intents and saving validated footwear orders to MongoDB.
 
 ## Project structure
 
 ```text
 src/
-  app.js              # Express app setup and route registration
-  server.js           # Database bootstrap and server startup
-  config/
-    database.js       # MongoDB connection configuration
-  controllers/
-    webhookController.js
-  models/
-    Order.js           # Order Mongoose schema
-  routes/
-    webhook.js         # Webhook route
+  app.js                         # Express configuration, health check, and routes
+  server.js                      # Database bootstrap and HTTP server startup
+  config/database.js             # MongoDB connection
+  controllers/webhookController.js
+  models/Order.js                # Validated Mongoose order schema
+  routes/webhook.js              # POST /webhook
+  utils/validateOrderParameters.js
 
-.env.example          # Example environment variables
-.gitignore            # Ignore environment and dependency files
-README.md             # Project documentation
-package.json          # Scripts and dependencies
-server.js             # Backward-compatible bootstrap entry point
+test/
+  app.test.js                    # HTTP behavior and webhook tests
+  orderValidation.test.js        # Order parameter validation tests
+
+.env.example
+.gitignore
+package.json
+package-lock.json
 ```
 
-## Features
+## Requirements
 
-- Telegram / Dialogflow webhook handling
-- Order validation for required customer and product fields
-- MongoDB persistence for order records
-- Health check endpoint for monitoring
-
-## Tech stack
-
-- Node.js
-- Express.js
-- MongoDB + Mongoose
-- JavaScript
+- Node.js 18 or newer (uses the built-in test runner and `node --watch`)
+- MongoDB, for saving orders
 
 ## Run locally
-
-1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-2. Copy environment variables:
+Set the runtime environment variables before starting the service. `.env.example` is a reference; this project does not automatically load `.env` files.
+
+macOS / Linux:
 
 ```bash
-cp .env.example .env
-```
-
-3. Start the server:
-
-```bash
+export MONGODB_URI='mongodb://localhost:27017/shoe_store'
+export PORT=3000
 npm start
 ```
 
-4. Or run in dev mode:
+PowerShell:
 
-```bash
-npm run dev
+```powershell
+$env:MONGODB_URI = 'mongodb://localhost:27017/shoe_store'
+$env:PORT = '3000'
+npm start
 ```
+
+For development, use `npm run dev`. Run the test suite with `npm test`; tests do not require a MongoDB instance.
+
+## Endpoints
+
+- `GET /health` — returns `{ "status": "ok" }` when the HTTP app is available.
+- `POST /webhook` — accepts Dialogflow webhook JSON. The `Order` intent requires product, size, quantity, name, phone, email, and address parameters.
 
 ## Environment variables
 
-Create a `.env` file with values like:
+| Variable | Required | Description |
+| --- | --- | --- |
+| `MONGODB_URI` | Yes | MongoDB connection string |
+| `PORT` | No | HTTP port (defaults to `3000`) |
 
-```env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/shoe_store
-```
+## Scope
 
-## Notes
-
-This repository was reorganized to make the codebase easier to read and maintain. The app logic has been split into small modules so it is easier for other developers to understand and extend.
+The current implementation handles Dialogflow order webhook requests. Telegram Bot API integration, FAQ behavior, inventory management, and webhook signature verification are not implemented in this codebase yet.

@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const validateOrderParameters = require('../utils/validateOrderParameters');
 
 const createOrder = async (req, res) => {
   const queryResult = req.body?.queryResult;
@@ -10,52 +11,37 @@ const createOrder = async (req, res) => {
     });
   }
 
-  const params = queryResult?.parameters || {};
-  const {
-    product,
-    size,
-    quantity,
-    name,
-    phone,
-    email,
-    address,
-    note
-  } = params;
+  const params = queryResult.parameters || {};
+  const validation = validateOrderParameters(params);
 
-  if (!product || !size || !quantity || !name || !phone || !email || !address) {
-    return res.json({
-      fulfillmentText:
-        'Please provide complete details: product, size, quantity, name, phone, email, and address.'
-    });
+  if (!validation.valid) {
+    return res.json({ fulfillmentText: validation.message });
   }
 
   try {
-    const newOrder = await Order.create({
-      product,
-      size,
-      quantity,
-      name,
-      phone,
-      email,
-      address,
-      note: note || 'No additional note'
+    const order = await Order.create({
+      ...validation.value,
+      note: typeof params.note === 'string' && params.note.trim()
+        ? params.note.trim()
+        : 'No additional note'
     });
 
-    const fulfillmentText = `
-      Thank you for your order, here are the details:
-      Product: ${newOrder.product}
-      Size: ${newOrder.size}
-      Quantity: ${newOrder.quantity}
-      Name: ${newOrder.name}
-      Phone: ${newOrder.phone}
-      Email: ${newOrder.email}
-      Address: ${newOrder.address}
-      Note: ${newOrder.note || 'No additional note.'}
-    `;
+    const fulfillmentText = [
+      'Thank you for your order, here are the details:',
+      `Product: ${order.product}`,
+      `Size: ${order.size}`,
+      `Quantity: ${order.quantity}`,
+      `Name: ${order.name}`,
+      `Phone: ${order.phone}`,
+      `Email: ${order.email}`,
+      `Address: ${order.address}`,
+      `Note: ${order.note}`
+    ].join('\n');
 
     return res.json({ fulfillmentText });
   } catch (error) {
-    console.error('Error saving order:', error);
+    // Avoid logging order contents or customer personal information.
+    console.error('Error saving order:', error.message);
     return res.json({
       fulfillmentText: 'There was an error processing your order. Please try again later.'
     });

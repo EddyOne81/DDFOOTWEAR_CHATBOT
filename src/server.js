@@ -3,11 +3,19 @@ const connectDB = require('./config/database');
 
 const PORT = process.env.PORT || 3000;
 
-const startServer = async () => {
+async function startServer() {
   await connectDB();
-  app.listen(PORT, () => {
+
+  return app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
-};
+}
 
-startServer();
+if (require.main === module) {
+  startServer().catch((error) => {
+    console.error('Failed to start server:', error.message);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = startServer;
